@@ -1,4 +1,4 @@
-from flask import Flask, redirect
+from flask import Flask, redirect, render_template
 from model import *
 from flask import request
 from flask_login import LoginManager, login_required, logout_user
@@ -19,40 +19,6 @@ def load_user(user_id):
     return database.session.query(User).get(user_id)
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        title = request.form.get('title')
-        categories = request.form.getlist('category')
-        places = request.form.getlist('place')
-        cities = request.form.getlist('city')
-
-
-@app.route('/project/<int:id>')
-def project(id):
-    pass
-
-
-@app.route('/project/add', methods=['GET', 'POST'])
-@login_required
-def add_project():
-    pass
-
-
-@app.route('/project/<int:id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_project(id):
-    pass
-
-
-@app.route('/project/<int:id>/comment', methods=['GET', 'POST'])
-@login_required
-def comment(id):
-    if request.method == 'POST':
-        text = request.form.get('text')
-    return redirect(f'/project/{id}#comments')
-
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     pass
@@ -68,6 +34,45 @@ def login():
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    return redirect('/projects')
+
+
+@app.route('/projects')
+def projects():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        categories = request.form.getlist('category')
+        places = request.form.getlist('place')
+        cities = request.form.getlist('city')
+
+
+@app.route('/project/<int:id>')
+def project(id):
+    pass
+
+
+@app.route('/create', methods=['GET', 'POST'])
+@login_required
+def create_project():
+    pass
+
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_project(id):
+    pass
+
+
+@app.route('/comment/<int:id>', methods=['GET', 'POST'])
+@login_required
+def comment(id):
+    if request.method == 'POST':
+        text = request.form.get('text')
+    return redirect(f'/project/{id}#comments')
 
 
 if __name__ == '__main__':
