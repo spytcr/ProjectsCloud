@@ -1,3 +1,28 @@
 body {
     padding: 5px;
 }
+.my-dark {
+    background-color: #212121;
+}
+.div-center {
+    max-width:500px;
+    width:90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+.form-control, .form-control:focus {
+      background:none;
+      border:none;
+      border-bottom:1px solid #434a52;
+      border-radius:0;
+      box-shadow:none;
+      outline:none;
+      color:inherit;
+}
+
+.form-control::placeholder{
+    color: darkgray;
+}
