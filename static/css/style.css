@@ -1,9 +1,10 @@
 body {
-    padding: 5px;
+    padding-top: 75px;
 }
 .my-dark {
     background-color: #212121;
 }
+
 .div-center {
     max-width:500px;
     width:90%;
@@ -11,6 +12,23 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%)
+}
+.bootstrap-select .btn {
+    background:none;
+    color: white;
+}
+.bootstrap-select .dropdown-menu {
+    background:#212121;
+}
+.bootstrap-select .dropdown-item {
+    color:white;
+}
+.bootstrap-select .dropdown-item:hover {
+    background-color:black;
+}
+.bootstrap-select .no-results{
+    background: none;
+    color: white;
 }
 
 .form-control, .form-control:focus {
@@ -20,9 +38,23 @@ body {
       border-radius:0;
       box-shadow:none;
       outline:none;
-      color:inherit;
+      color:white;
 }
 
 .form-control::placeholder{
     color: darkgray;
+}
+
+.embed-responsive{
+  position: relative;
+  padding-top: 56.25%;
+}
+.embed-responsive-item{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }

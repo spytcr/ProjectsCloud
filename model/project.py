@@ -7,7 +7,7 @@ class Project(database.Model):
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     title = database.Column(database.String, nullable=False)
     description = database.Column(database.String, nullable=False)
-    video = database.Column(database.String, nullable=False)
+    youtube = database.Column(database.String, nullable=False)
     github = database.Column(database.String, nullable=False)
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'), nullable=True)
     category = database.relationship('Category')

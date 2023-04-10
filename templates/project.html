@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card text-white text-center my-dark mb-3">
+    <div class="card-header"><h2>{{ project.title }}</h2></div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex">
+                <p class="m-1 p-1 border rounded border-white">
+                    <i class="bi bi-bookmarks"></i>
+                    {{ project.category.name }}
+                </p>
+                <p class="m-1 p-1 border rounded border-white">
+                    <i class="bi bi-person"></i>
+                    {{ project.user.name }} {{ project.user.surname }}
+                </p>
+            </div>
+            <div>
+                 <small>{{ project.created_time.strftime('%d.%m.%Y') }}</small>
+                 {% if project.user == current_user %}
+                     <a href="/edit/{{ project.id }}" class="ms-2">
+                        <i class="bi bi-pencil text-primary"></i>
+                     </a>
+                     <a href="/delete/{{ project.id }}">
+                         <i class="bi bi-trash text-danger"></i>
+                     </a>
+                 {% endif %}
+             </div>
+
+        </div>
+        <div class="embed-responsive embed-responsive-16by9 mb-3">
+            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ project.youtube }}"></iframe>
+        </div>
+        <p class="lead"> {{ project.description }} </p>
+        <div class="text-start"><a href="{{ project.github }}"><i class="bi bi-github"></i> {{ project.github }}</a></div>
+    </div>
+</div>
+<div class="card text-white my-dark mb-3" id="comments">
+    <div class="card-header">
+        {% if current_user.is_authenticated %}
+             <form class="form-inline d-inline" action="/comment/{{ project.id }}" method="post">
+                <div class="input-group">
+                    {{ comment_form.hidden_tag() }}
+                    {{ comment_form.comment(class="form-control", placeholder=comment_form.comment.label.text) }}
+                    {% for error in comment_form.comment.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                    {{ comment_form.submit(type="submit", class="btn btn-warning") }}
+                </div>
+             </form>
+        {% else %}
+            <h4>Войдите, чтобы оставить комментарий</h4>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% for comment in comments %}
+            <div class="border rounded border-secondary p-3 mb-3">
+                 <div class="d-flex justify-content-between align-items-center mb-2 border-bottom border-secondary">
+                    <p>
+                        <i class="bi bi-person"></i>
+                        <b>{{ comment.user.name }} {{ comment.user.surname }}</b>
+                    </p>
+                     <div>
+                         <small>{{ project.created_time.strftime('%d.%m.%Y') }}</small>
+                         {% if comment.user == current_user %}
+                             <a href="/comment/{{ project.id }}/delete/{{ comment.id }}" class="ms-2">
+                                 <i class="bi bi-trash text-danger"></i>
+                             </a>
+                         {% endif %}
+                     </div>
+                </div>
+                <p>{{ comment.text }}</p>
+            </div>
+
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

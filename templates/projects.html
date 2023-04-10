@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="navbar navbar-dark mb-3">
+    <form class="form-inline d-inline w-100" action="" method="post">
+        <div class="input-group">
+            {{ form.hidden_tag() }}
+            {{ form.category(class="selectpicker", **{'title': form.category.label.text}) }}
+            {% for error in form.category.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+            {{ form.place(class="selectpicker", **{'title': form.place.label.text,
+            'data-live-search': 'true', 'data-live-search-placeholder': 'Поиск'}) }}
+            {% for error in form.place.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+            {{ form.query(class="form-control", placeholder=form.query.label.text) }}
+            {% for error in form.query.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+            {{ form.submit(type="submit", class="btn btn-warning") }}
+        </div>
+    </form>
+</nav>
+<div class="row">
+    {% if current_user.is_authenticated %}
+         <div class="col-md-4 mb-4">
+            <div class="card h-100 d-flex justify-content-center align-items-center my-dark ">
+                <svg xmlns="http://www.w3.org/2000/svg"  fill="#ffc107" class="bi bi-plus-circle w-50" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <a href="/create" class="stretched-link"></a>
+            </div>
+         </div>
+    {% endif %}
+    {% for project in projects %}
+        <div class="col-md-4 mb-4">
+            <div class="card text-white my-dark">
+                <img class="card-img-top" src="https://i.ytimg.com/vi/{{ project.youtube }}/maxresdefault.jpg" alt="Project preview">
+                <div class="card-body">
+                    <h3 class="card-text">{{ project.title }}</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="m-1 p-1 border rounded border-white">
+                            <i class="bi bi-bookmarks"></i>
+                            {{ project.category.name }}
+                        </p>
+                        <small>{{ project.created_time.strftime('%d.%m.%Y') }}</small>
+                    </div>
+                </div>
+                <a href="/project/{{ project.id }}" class="stretched-link"></a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

@@ -1,8 +1,10 @@
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, abort
 
+from form.comment import CommentForm
 from form.login import LoginForm
 from form.profile import ProfileForm
 from form.register import RegisterForm
+from form.search import SearchForm
 from model import *
 from flask import request
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
@@ -26,7 +28,7 @@ def load_user(user_id):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect('/')
+        abort(404)
     form = RegisterForm()
     form.place.choices = {city.name: [(place.id, place.name) for place in city.places]
                           for city in database.session.query(City).all()}
@@ -51,7 +53,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect('/')
+        abort(404)
     form = LoginForm()
     if form.validate_on_submit():
         user = database.session.query(User).filter(User.email == form.email.data).first()
@@ -94,18 +96,31 @@ def index():
     return redirect('/projects')
 
 
-@app.route('/projects')
+@app.route('/projects', methods=['GET', 'POST'])
 def projects():
-    if request.method == 'POST':
-        title = request.form.get('title')
-        categories = request.form.getlist('category')
-        places = request.form.getlist('place')
-        cities = request.form.getlist('city')
+    form = SearchForm()
+    form.category.choices = [(category.id, category.name)
+                             for category in database.session.query(Category).all()]
+    form.place.choices = {city.name: [(place.id, place.name) for place in city.places]
+                          for city in database.session.query(City).all()}
+    if form.validate_on_submit():
+        projects = database.session.query(Project).join(Project.user).filter(
+            Project.title.ilike(f'%{form.query.data.lower()}%'),
+            not form.category.data or Project.category_id.in_(form.category.data),
+            not form.place.data or User.id.in_(form.place.data)).all()
+    else:
+        projects = database.session.query(Project).all()
+    return render_template('projects.html', form=form, projects=projects)
 
 
 @app.route('/project/<int:id>')
 def project(id):
-    pass
+    project = database.session.query(Project).filter(Project.id == id).first()
+    if not project:
+        abort(404)
+    comment_form = CommentForm()
+    comments = database.session.query(Comment).filter(Comment.project_id == id).all()
+    return render_template('project.html', project=project, comment_form=comment_form, comments=comments)
 
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -123,9 +138,30 @@ def edit_project(id):
 @app.route('/comment/<int:id>', methods=['GET', 'POST'])
 @login_required
 def comment(id):
-    if request.method == 'POST':
-        text = request.form.get('text')
+    project = database.session.query(Project).filter(Project.id == id).first()
+    if not project:
+        abort(404)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(
+            text=form.comment.data,
+            user_id=current_user.id,
+            project_id=project.id
+        )
+        database.session.add(comment)
+        database.session.commit()
     return redirect(f'/project/{id}#comments')
+
+
+@app.route('/comment/<int:project_id>/delete/<int:comment_id>')
+@login_required
+def comment_delete(project_id, comment_id):
+    comment = database.session.query(Comment).filter(
+        Comment.project_id == project_id, Comment.id == comment_id, Comment.user == current_user).first()
+    if comment:
+        database.session.delete(comment)
+        database.session.commit()
+    return redirect(f'/project/{project_id}#comments')
 
 
 if __name__ == '__main__':
