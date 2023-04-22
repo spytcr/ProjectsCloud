@@ -10,10 +10,10 @@ GITHUB_REGEX = r'https://github\.com/\w*/\w*'
 class Project(database.Model, SerializerMixin):
     __tablename__ = 'projects'
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    title = database.Column(database.String, nullable=False)
-    description = database.Column(database.String, nullable=False)
-    youtube = database.Column(database.String, nullable=False)
-    github = database.Column(database.String, nullable=False)
+    title = database.Column(database.String(255), nullable=False)
+    description = database.Column(database.Text, nullable=False)
+    youtube = database.Column(database.String(255), nullable=False)
+    github = database.Column(database.String(255), nullable=False)
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'), nullable=False)
     category = database.relationship('Category')
     user_id = database.Column(database.Integer, database.ForeignKey('users.id', ondelete='CASCADE',

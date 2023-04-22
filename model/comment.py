@@ -6,7 +6,7 @@ import datetime
 class Comment(database.Model, SerializerMixin):
     __tablename__ = 'comments'
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    text = database.Column(database.String, nullable=False)
+    text = database.Column(database.Text, nullable=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id', ondelete='CASCADE',
                                                                     onupdate='CASCADE'), nullable=False)
     user = database.relationship('User')
