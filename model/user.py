@@ -1,16 +1,17 @@
 from flask_login import UserMixin
+from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import database
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-class User(database.Model, UserMixin):
+class User(database.Model, UserMixin, SerializerMixin):
     __tablename__ = 'users'
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     name = database.Column(database.String, nullable=False)
     surname = database.Column(database.String, nullable=False)
-    place_id = database.Column(database.Integer, database.ForeignKey('places.id'), nullable=True)
+    place_id = database.Column(database.Integer, database.ForeignKey('places.id'), nullable=False)
     place = database.relationship('Place')
     email = database.Column(database.String, nullable=False, index=True, unique=True)
     hashed_password = database.Column(database.String, nullable=False)

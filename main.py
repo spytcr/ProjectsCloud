@@ -1,13 +1,18 @@
 from flask import Flask, redirect, render_template, abort
+from flask_restful import Api
 
 from form.comment import CommentForm
 from form.login import LoginForm
 from form.profile import ProfileForm
+from form.project import ProjectForm
 from form.register import RegisterForm
 from form.search import SearchForm
 from model import *
 from flask import request
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
+
+from resources.place import PlacesResource
+from resources.project import ProjectResource, ProjectsResource
 
 app = Flask(__name__)
 app.config.from_object(app.config.from_object('config.DebugConfig'))
@@ -23,6 +28,12 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     return database.session.query(User).get(user_id)
+
+
+api = Api(app)
+api.add_resource(ProjectResource, '/api/project/<int:id>')
+api.add_resource(ProjectsResource, '/api/projects')
+api.add_resource(PlacesResource, '/api/places')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -126,13 +137,61 @@ def project(id):
 @app.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_project():
-    pass
+    form = ProjectForm()
+    form.category.choices = [(category.id, category.name)
+                             for category in database.session.query(Category).all()]
+    if form.validate_on_submit():
+        project = Project(
+            title=form.title.data,
+            description=form.description.data,
+            github=form.github.data,
+            category_id=form.category.data,
+            user_id=current_user.id
+        )
+        project.set_youtube(form.youtube.data)
+        database.session.add(project)
+        database.session.commit()
+        return redirect('/')
+    return render_template('edit.html', form=form)
 
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_project(id):
-    pass
+    project = database.session.query(Project).filter(Project.id == id, Project.user == current_user).first()
+    if not project:
+        abort(404)
+    form = ProjectForm()
+    form.category.choices = [(category.id, category.name)
+                             for category in database.session.query(Category).all()]
+    if request.method == 'GET':
+        form.title.data = project.title
+        form.description.data = project.description
+        form.youtube.data = project.get_youtube()
+        form.github.data = project.github
+        form.category.default = project.category_id
+        form.category.process([])
+    elif form.validate_on_submit():
+        project.title = form.title.data
+        project.description = form.description.data
+        project.set_youtube(form.youtube.data)
+        project.github = form.github.data
+        project.category_id = form.category.data
+        database.session.commit()
+        return redirect(f'/project/{id}')
+    return render_template('edit.html', form=form)
+
+
+@app.route('/delete/<int:id>')
+@login_required
+def delete_project(id):
+    project = database.session.query(Project).filter(Project.id == id, Project.user == current_user).first()
+    if project:
+        database.session.delete(project)
+        database.session.commit()
+    else:
+        abort(404)
+    return redirect('/')
 
 
 @app.route('/comment/<int:id>', methods=['GET', 'POST'])
@@ -161,6 +220,8 @@ def comment_delete(project_id, comment_id):
     if comment:
         database.session.delete(comment)
         database.session.commit()
+    else:
+        abort(404)
     return redirect(f'/project/{project_id}#comments')
 
 

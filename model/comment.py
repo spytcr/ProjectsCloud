@@ -1,8 +1,9 @@
+from sqlalchemy_serializer import SerializerMixin
 from .db_session import database
 import datetime
 
 
-class Comment(database.Model):
+class Comment(database.Model, SerializerMixin):
     __tablename__ = 'comments'
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     text = database.Column(database.String, nullable=False)
