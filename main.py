@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, abort
 from flask_restful import Api
 
+from config import DebugConfig
 from form.comment import CommentForm
 from form.login import LoginForm
 from form.profile import ProfileForm
@@ -15,6 +16,7 @@ from resources.place import PlacesResource
 from resources.project import ProjectResource, ProjectsResource
 
 app = Flask(__name__)
+app.config.from_object(DebugConfig)
 
 database.init_app(app)
 with app.app_context():
@@ -225,5 +227,4 @@ def comment_delete(project_id, comment_id):
 
 
 if __name__ == '__main__':
-    app.config.from_object(app.config.from_object('config.DebugConfig'))
     app.run()
