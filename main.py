@@ -15,7 +15,6 @@ from resources.place import PlacesResource
 from resources.project import ProjectResource, ProjectsResource
 
 app = Flask(__name__)
-app.config.from_object(app.config.from_object('config.DebugConfig'))
 
 database.init_app(app)
 with app.app_context():
@@ -226,4 +225,5 @@ def comment_delete(project_id, comment_id):
 
 
 if __name__ == '__main__':
+    app.config.from_object(app.config.from_object('config.DebugConfig'))
     app.run()
