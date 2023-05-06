@@ -1,2 +1,2 @@
 # ProjectsCloud
-https://projectscloud.site/projects
+https://projectscloud.site
