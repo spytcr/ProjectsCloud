@@ -1,54 +1,26 @@
 {% extends "base.html" %}
+{% from "macros.html" import errors %}
+
+{% block title %}Проект — Projects cloud{% endblock %}
 
 {% block content %}
     <div class="card text-white text-center my-dark div-center">
-        <div class="card-header"><h2>Добавить проект</h2></div>
+        <div class="card-header"><h2>{{ 'Добавить проект' if request.endpoint == 'main.create_project' else 'Редактировать проект' }}</h2></div>
         <div class="card-body">
             <form action="" method="post">
                 {{ form.hidden_tag() }}
-                <div class="form-group mb-4" >
-                    {{ form.title(class="form-control", placeholder=form.title.label.text) }}
-                    {% for error in form.title.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="form-group mb-4" >
-                    {{ form.description(class="form-control", placeholder=form.description.label.text) }}
-                    {% for error in form.description.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="form-group mb-4" >
-                    {{ form.youtube(class="form-control", placeholder=form.youtube.label.text) }}
-                    {% for error in form.youtube.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="form-group mb-4" >
-                    {{ form.github(class="form-control", placeholder=form.github.label.text) }}
-                    {% for error in form.github.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
+                {% for f in [form.title, form.description, form.youtube, form.github] %}
+                    <div class="form-group mb-4">
+                        {{ f(class="form-control", placeholder=f.label.text) }}
+                        {{ errors(f) }}
+                    </div>
+                {% endfor %}
                 <div class="form-group mb-4">
                     {{ form.category.label(class="mb-2") }}
                     {{ form.category(class="selectpicker dropdown-center w-100") }}
-                    {% for error in form.category.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
+                    {{ errors(form.category) }}
                 </div>
                 {{ form.submit(type="submit", class="btn btn-warning btn-lg w-100 mb-2") }}
-                <div class="text-danger">{{ message }}</div>
             </form>
         </div>
     </div>

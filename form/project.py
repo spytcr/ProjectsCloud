@@ -1,12 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, URLField, SelectField
-from wtforms.validators import DataRequired, ValidationError, Regexp
-import re
+from wtforms.validators import DataRequired, Length, Regexp
+
 from model.project import YOUTUBE_REGEX, GITHUB_REGEX
 
 
 class ProjectForm(FlaskForm):
-    title = StringField('Название', validators=[DataRequired()])
+    title = StringField('Название', validators=[DataRequired(), Length(max=255)])
     description = TextAreaField('Описание', validators=[DataRequired()])
     youtube = URLField('Ссылка на youtube видео', validators=[
         DataRequired(), Regexp(YOUTUBE_REGEX, message='Неверный формат ссылки')])

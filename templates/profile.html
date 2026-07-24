@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import errors %}
+
+{% block title %}Профиль — Projects cloud{% endblock %}
 
 {% block content %}
     <div class="card text-white text-center my-dark div-center">
@@ -10,30 +13,15 @@
                     {{ form.place.label(class="mb-1") }}<br>
                     {{ form.place(class="selectpicker", **{'data-live-search': 'true',
                     'data-live-search-placeholder': 'Поиск'}) }}
-                    {% for error in form.place.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
+                    {{ errors(form.place) }}
                 </div>
-                <div class="form-group mb-4" >
-                    {{ form.name(class="form-control", placeholder=form.name.label.text) }}
-                    {% for error in form.name.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="form-group mb-4" >
-                    {{ form.surname(class="form-control", placeholder=form.surname.label.text) }}
-                    {% for error in form.surname.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
+                {% for f in [form.name, form.surname] %}
+                    <div class="form-group mb-4">
+                        {{ f(class="form-control", placeholder=f.label.text) }}
+                        {{ errors(f) }}
+                    </div>
+                {% endfor %}
                 {{ form.submit(type="submit", class="btn btn-warning btn-lg w-100 mb-2") }}
-                <div class="text-danger">{{ message }}</div>
             </form>
         </div>
     </div>

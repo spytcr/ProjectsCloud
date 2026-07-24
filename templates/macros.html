@@ -1,0 +1,27 @@
+{# Общие макросы для форм: раньше блоки вывода ошибок были скопированы в каждом шаблоне. #}
+
+{% macro errors(field) %}
+    {% for error in field.errors %}
+        <div class="alert alert-danger py-1 px-2 mt-1 mb-0" role="alert">{{ error }}</div>
+    {% endfor %}
+{% endmacro %}
+
+{% macro field(f, css='form-control') %}
+    <div class="mb-3">
+        {{ f.label(class="form-label") }}
+        {{ f(class=css + (' is-invalid' if f.errors else '')) }}
+        {{ errors(f) }}
+    </div>
+{% endmacro %}
+
+{# Кнопка, отправляющая POST: мутации не должны выполняться по GET-ссылке. #}
+{% macro post_button(action, label, css='btn btn-danger', confirm=None, icon=None) %}
+    <form method="post" action="{{ action }}" class="d-inline"
+          {% if confirm %}onsubmit="return confirm('{{ confirm }}')"{% endif %}>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="{{ css }}">
+            {% if icon %}<i class="bi bi-{{ icon }}"></i>{% endif %}
+            {{ label }}
+        </button>
+    </form>
+{% endmacro %}

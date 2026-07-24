@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Страница не найдена — Projects cloud{% endblock %}
+
+{% block content %}
+    <div class="card text-white text-center my-dark div-center">
+        <div class="card-header"><h2>404</h2></div>
+        <div class="card-body">
+            <p class="lead">Такой страницы нет, либо у вас нет к ней доступа.</p>
+            <a href="{{ url_for('main.projects') }}" class="btn btn-warning">К списку проектов</a>
+        </div>
+    </div>
+{% endblock %}

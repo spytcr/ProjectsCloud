@@ -3,8 +3,8 @@ from .db_session import database
 import datetime
 import re
 
-YOUTUBE_REGEX = r'https://(?:youtu\.be/|(?:[a-z]{2,3}\.)?youtube\.com/watch(?:\?|#!)v=)([\w-]{11}).*'
-GITHUB_REGEX = r'https://github\.com/\w*/\w*'
+YOUTUBE_REGEX = r'https://(?:youtu\.be/|(?:[a-z]{2,3}\.)?youtube\.com/watch(?:\?|#!)v=)([\w-]{11})(?:[?&#].*)?$'
+GITHUB_REGEX = r'https://github\.com/[\w.-]+/[\w.-]+/?$'
 
 
 class Project(database.Model, SerializerMixin):
@@ -23,7 +23,12 @@ class Project(database.Model, SerializerMixin):
     created_time = database.Column(database.DateTime, default=datetime.datetime.now)
 
     def set_youtube(self, youtube):
-        self.youtube = re.match(YOUTUBE_REGEX, youtube)[1]
+        """Сохраняет 11-символьный video ID, а не URL: ссылка любого формата
+        даёт одну и ту же запись, а превью и embed собираются из ID без парсинга."""
+        match = re.match(YOUTUBE_REGEX, youtube or '')
+        if not match:
+            raise ValueError(f'Не удалось извлечь id видео из ссылки: {youtube!r}')
+        self.youtube = match[1]
 
     def get_youtube(self):
         return 'https://youtu.be/' + self.youtube

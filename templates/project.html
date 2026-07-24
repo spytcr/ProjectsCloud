@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import errors, post_button %}
+
+{% block title %}{{ project.title }} — Projects cloud{% endblock %}
 
 {% block content %}
 <div class="card text-white text-center my-dark mb-3">
@@ -15,24 +18,29 @@
                     {{ project.user.name }} {{ project.user.surname }}
                 </p>
             </div>
-            <div>
+            <div class="d-flex align-items-center">
                  <small>{{ project.created_time.strftime('%d.%m.%Y') }}</small>
                  {% if project.user == current_user %}
-                     <a href="/edit/{{ project.id }}" class="ms-2">
+                     <a href="{{ url_for('main.edit_project', id=project.id) }}" class="ms-2"
+                        aria-label="Редактировать проект">
                         <i class="bi bi-pencil text-primary"></i>
                      </a>
-                     <a href="/delete/{{ project.id }}">
-                         <i class="bi bi-trash text-danger"></i>
-                     </a>
+                     {{ post_button(url_for('main.delete_project', id=project.id), '',
+                                    css='btn btn-link p-0 ms-2', icon='trash',
+                                    confirm='Удалить проект? Действие необратимо.') }}
                  {% endif %}
              </div>
         </div>
-        <div class="embed-responsive embed-responsive-16by9 mb-3">
-            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ project.youtube }}"></iframe>
+        <div class="ratio ratio-16x9 mb-3">
+            <iframe src="https://www.youtube.com/embed/{{ project.youtube }}"
+                    title="Демонстрация проекта «{{ project.title }}»"
+                    allowfullscreen loading="lazy"></iframe>
         </div>
-        <p class="lead"> {{ project.description }} </p>
+        <p class="lead text-start preserve-lines">{{ project.description }}</p>
         <div class="d-flex justify-content-between">
-            <a href="{{ project.github }}"><i class="bi bi-github"></i> {{ project.github }}</a>
+            <a href="{{ project.github }}" rel="noopener noreferrer nofollow" target="_blank">
+                <i class="bi bi-github"></i> {{ project.github }}
+            </a>
             <p>
                 {{ project.user.place.city.name }}, {{ project.user.place.name }}
             </p>
@@ -42,42 +50,44 @@
 <div class="card text-white my-dark mb-3" id="comments">
     <div class="card-header">
         {% if current_user.is_authenticated %}
-             <form class="form-inline d-inline" action="/comment/{{ project.id }}" method="post">
+             <form class="form-inline d-inline" method="post"
+                   action="{{ url_for('main.comment', id=project.id) }}">
                 <div class="input-group">
                     {{ comment_form.hidden_tag() }}
-                    {{ comment_form.comment(class="form-control", placeholder=comment_form.comment.label.text) }}
-                    {% for error in comment_form.comment.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
+                    {{ comment_form.comment(class="form-control", rows=2,
+                                            placeholder=comment_form.comment.label.text) }}
                     {{ comment_form.submit(type="submit", class="btn btn-warning") }}
                 </div>
+                {{ errors(comment_form.comment) }}
              </form>
         {% else %}
-            <h4>Войдите, чтобы оставить комментарий</h4>
+            <h4>
+                <a href="{{ url_for('main.login') }}" class="text-warning">Войдите</a>,
+                чтобы оставить комментарий
+            </h4>
         {% endif %}
     </div>
     <div class="card-body">
         {% for comment in comments %}
             <div class="border rounded border-secondary p-3 mb-3">
                  <div class="d-flex justify-content-between align-items-center mb-2 border-bottom border-secondary">
-                    <p>
+                    <p class="mb-1">
                         <i class="bi bi-person"></i>
                         <b>{{ comment.user.name }} {{ comment.user.surname }}</b>
                     </p>
-                     <div>
-                         <small>{{ project.created_time.strftime('%d.%m.%Y') }}</small>
+                     <div class="d-flex align-items-center">
+                         <small>{{ comment.created_time.strftime('%d.%m.%Y') }}</small>
                          {% if comment.user == current_user %}
-                             <a href="/comment/{{ project.id }}/delete/{{ comment.id }}" class="ms-2">
-                                 <i class="bi bi-trash text-danger"></i>
-                             </a>
+                             {{ post_button(url_for('main.comment_delete', project_id=project.id,
+                                                    comment_id=comment.id), '',
+                                            css='btn btn-link p-0 ms-2', icon='trash') }}
                          {% endif %}
                      </div>
                 </div>
-                <p>{{ comment.text }}</p>
+                <p class="mb-0 preserve-lines">{{ comment.text }}</p>
             </div>
-
+        {% else %}
+            <p class="text-secondary mb-0">Комментариев пока нет.</p>
         {% endfor %}
     </div>
 </div>

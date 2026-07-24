@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField
-from wtforms.validators import DataRequired
+from wtforms import SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Length
 
 
 class CommentForm(FlaskForm):
-    comment = StringField('Оставьте комментарий', validators=[DataRequired()])
+    comment = TextAreaField('Оставьте комментарий', validators=[
+        DataRequired(), Length(max=2000, message='Не более 2000 символов')])
     submit = SubmitField('Отправить')

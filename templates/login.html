@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import errors %}
+
+{% block title %}Вход — Projects cloud{% endblock %}
 
 {% block content %}
     <div class="card text-white text-center my-dark div-center">
@@ -6,28 +9,20 @@
         <div class="card-body">
             <form action="" method="post">
                 {{ form.hidden_tag() }}
-                <div class="form-group mb-4" >
-                    {{ form.email(class="form-control", type="email", placeholder=form.email.label.text) }}
-                    {% for error in form.email.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="form-group mb-4">
-                    {{ form.password(class="form-control", type="password", placeholder=form.password.label.text) }}
-                    {% for error in form.password.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
+                {% for f in [form.email, form.password] %}
+                    <div class="form-group mb-4">
+                        {{ f(class="form-control", placeholder=f.label.text) }}
+                        {{ errors(f) }}
+                    </div>
+                {% endfor %}
                 <div class="form-check-inline mb-4">
                     {{ form.remember_me() }} {{ form.remember_me.label }}
                 </div>
                 {{ form.submit(type="submit", class="btn btn-warning btn-lg w-100 mb-2") }}
-                <div class="text-danger">{{ message }}</div>
             </form>
+            <small class="text-secondary">
+                Нет аккаунта? <a href="{{ url_for('main.register') }}" class="text-warning">Зарегистрироваться</a>
+            </small>
         </div>
     </div>
 {% endblock %}

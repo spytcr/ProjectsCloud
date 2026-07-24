@@ -45,16 +45,17 @@ body {
     color: darkgray;
 }
 
-.embed-responsive{
-  position: relative;
-  padding-top: 56.25%;
+/* Встраивание видео делает bootstrap-класс .ratio, своих правил не требуется. */
+
+/* Описания и комментарии вводятся многострочно — сохраняем переносы,
+   не прибегая к небезопасному выводу HTML. */
+.preserve-lines {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
 }
-.embed-responsive-item{
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
+
+.pagination .page-item.active .page-link {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212121;
 }
